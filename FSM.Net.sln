@@ -8,7 +8,19 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = ".config", ".config", "{A53A
 		.editorconfig = .editorconfig
 	EndProjectSection
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "FSM.Net.Standard", "FSM.Net.Standard\FSM.Net.Standard.csproj", "{D9F5286C-D459-401A-B34D-AA16AC221DF7}"
+EndProject
 Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{D9F5286C-D459-401A-B34D-AA16AC221DF7}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{D9F5286C-D459-401A-B34D-AA16AC221DF7}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{D9F5286C-D459-401A-B34D-AA16AC221DF7}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{D9F5286C-D459-401A-B34D-AA16AC221DF7}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
 	EndGlobalSection
