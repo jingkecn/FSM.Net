@@ -55,6 +55,18 @@ namespace FSM.Net.Core.NUnitTest
             }
         }
 
+        public static IEnumerable TestCaseExists
+        {
+            get
+            {
+                yield return new TestCaseData(S00).Returns(true);
+                yield return new TestCaseData(S01).Returns(true);
+                yield return new TestCaseData(S10).Returns(true);
+                yield return new TestCaseData(S11).Returns(true);
+                yield return new TestCaseData(StateNotExists).Returns(false);
+            }
+        }
+
         public static IEnumerable TestCaseSearch
         {
             get
@@ -107,6 +119,16 @@ namespace FSM.Net.Core.NUnitTest
             StateMachine.Insert(S01, S10);
             StateMachine.Insert(S01, S11);
             return StateMachine.BuildPathTo(state).SequenceEqual(expected);
+        }
+
+        [Test]
+        [TestCaseSource(nameof(TestCaseExists))]
+        public bool TestExists(IState state)
+        {
+            StateMachine.Insert(S00);
+            StateMachine.Insert(S01, S10);
+            StateMachine.Insert(S01, S11);
+            return StateMachine.Exists(state);
         }
 
         [Test]

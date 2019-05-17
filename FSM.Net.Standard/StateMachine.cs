@@ -42,6 +42,11 @@ namespace FSM.Net.Standard
             return stack.ToArray();
         }
 
+        public bool Exists(IState state)
+        {
+            return BuildPathTo(state).Count() != 0;
+        }
+
         public Node<IState> Search(IState state)
         {
             return Search(node => node.Value == state).SingleOrDefault();
