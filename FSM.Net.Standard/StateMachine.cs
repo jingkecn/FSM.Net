@@ -4,7 +4,27 @@ using Trie.Net.Standard;
 
 namespace FSM.Net.Standard
 {
-    public class StateMachine : Trie<IState>
+    public partial class StateMachine
+    {
+        public void AddState(IState state, IState parent = null)
+        {
+            if (parent == null)
+            {
+                Insert(state);
+            }
+            else
+            {
+                var path = BuildPathTo(parent).ToList();
+                Remove(path.ToArray());
+                path.Add(state);
+                Insert(path.ToArray());
+            }
+        }
+    }
+
+    #region Implementation (Trie)
+
+    public partial class StateMachine : Trie<IState>
     {
         public void Activate(IState state)
         {
@@ -53,4 +73,6 @@ namespace FSM.Net.Standard
             return Search(node => node.Value == state).SingleOrDefault();
         }
     }
+
+    #endregion
 }

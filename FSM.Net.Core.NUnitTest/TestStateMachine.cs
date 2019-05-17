@@ -34,6 +34,26 @@ namespace FSM.Net.Core.NUnitTest
             }
         }
 
+        public static IEnumerable TestCaseAddS00
+        {
+            get { yield return new TestCaseData(S00, null, new[] {S00}).Returns(true); }
+        }
+
+        public static IEnumerable TestCaseAddS01
+        {
+            get { yield return new TestCaseData(S01, null, new[] {S01}).Returns(true); }
+        }
+
+        public static IEnumerable TestCaseAddS10
+        {
+            get { yield return new TestCaseData(S10, S01, new[] {S01, S10}).Returns(true); }
+        }
+
+        public static IEnumerable TestCaseAddS11
+        {
+            get { yield return new TestCaseData(S11, S01, new[] {S01, S11}).Returns(true); }
+        }
+
         public static IEnumerable TestCaseBuildPath
         {
             get
@@ -71,13 +91,20 @@ namespace FSM.Net.Core.NUnitTest
 
         private StateMachine StateMachine { get; set; }
 
+        private bool TestAddState(IState state, IState parent, IEnumerable<IState> expected)
+        {
+            StateMachine.AddState(state, parent);
+            return StateMachine.BuildPathTo(state).SequenceEqual(expected);
+        }
+
         [Test]
         [TestCaseSource(nameof(TestCaseActivate))]
         public bool TestActivate(IState state, IState[] expected)
         {
-            StateMachine.Insert(S00);
-            StateMachine.Insert(S01, S10);
-            StateMachine.Insert(S01, S11);
+            StateMachine.AddState(S00);
+            StateMachine.AddState(S01);
+            StateMachine.AddState(S10, S01);
+            StateMachine.AddState(S11, S01);
             StateMachine.Activate(state);
             var actual = new List<IState>();
             var node = StateMachine.Root;
@@ -92,12 +119,46 @@ namespace FSM.Net.Core.NUnitTest
         }
 
         [Test]
+        [TestCaseSource(nameof(TestCaseAddS00))]
+        public bool TestAddS00(IState state, IState parent, IState[] expected)
+        {
+            return TestAddState(state, parent, expected);
+        }
+
+        [Test]
+        [TestCaseSource(nameof(TestCaseAddS01))]
+        public bool TestAddS01(IState state, IState parent, IState[] expected)
+        {
+            StateMachine.AddState(S00);
+            return TestAddState(state, parent, expected);
+        }
+
+        [Test]
+        [TestCaseSource(nameof(TestCaseAddS10))]
+        public bool TestAddS10(IState state, IState parent, IState[] expected)
+        {
+            StateMachine.AddState(S00);
+            StateMachine.AddState(S01);
+            return TestAddState(state, parent, expected);
+        }
+
+        [Test]
+        [TestCaseSource(nameof(TestCaseAddS11))]
+        public bool TestAddS11(IState state, IState parent, IState[] expected)
+        {
+            StateMachine.AddState(S00);
+            StateMachine.AddState(S01);
+            return TestAddState(state, parent, expected);
+        }
+
+        [Test]
         [TestCaseSource(nameof(TestCaseBuildPath))]
         public bool TestBuildPathTo(IState state, IState[] expected)
         {
-            StateMachine.Insert(S00);
-            StateMachine.Insert(S01, S10);
-            StateMachine.Insert(S01, S11);
+            StateMachine.AddState(S00);
+            StateMachine.AddState(S01);
+            StateMachine.AddState(S10, S01);
+            StateMachine.AddState(S11, S01);
             return StateMachine.BuildPathTo(state).SequenceEqual(expected);
         }
 
@@ -105,9 +166,10 @@ namespace FSM.Net.Core.NUnitTest
         [TestCaseSource(nameof(TestCaseExists))]
         public bool TestExists(IState state)
         {
-            StateMachine.Insert(S00);
-            StateMachine.Insert(S01, S10);
-            StateMachine.Insert(S01, S11);
+            StateMachine.AddState(S00);
+            StateMachine.AddState(S01);
+            StateMachine.AddState(S10, S01);
+            StateMachine.AddState(S11, S01);
             return StateMachine.Exists(state);
         }
 
@@ -115,9 +177,10 @@ namespace FSM.Net.Core.NUnitTest
         [TestCaseSource(nameof(TestCaseSearch))]
         public bool TestSearch(IState state)
         {
-            StateMachine.Insert(S00);
-            StateMachine.Insert(S01, S10);
-            StateMachine.Insert(S01, S11);
+            StateMachine.AddState(S00);
+            StateMachine.AddState(S01);
+            StateMachine.AddState(S10, S01);
+            StateMachine.AddState(S11, S01);
             return StateMachine.Search(state) is Node<IState> node && node.Value == state;
         }
     }
