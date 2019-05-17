@@ -94,7 +94,7 @@ namespace FSM.Net.Core.NUnitTest
         private bool TestAddState(IState state, IState parent, IEnumerable<IState> expected)
         {
             StateMachine.AddState(state, parent);
-            return StateMachine.BuildPathTo(state).SequenceEqual(expected);
+            return StateMachine.PathTo(state).SequenceEqual(expected);
         }
 
         [Test]
@@ -152,17 +152,6 @@ namespace FSM.Net.Core.NUnitTest
         }
 
         [Test]
-        [TestCaseSource(nameof(TestCaseBuildPath))]
-        public bool TestBuildPathTo(IState state, IState[] expected)
-        {
-            StateMachine.AddState(S00);
-            StateMachine.AddState(S01);
-            StateMachine.AddState(S10, S01);
-            StateMachine.AddState(S11, S01);
-            return StateMachine.BuildPathTo(state).SequenceEqual(expected);
-        }
-
-        [Test]
         [TestCaseSource(nameof(TestCaseExists))]
         public bool TestExists(IState state)
         {
@@ -171,6 +160,17 @@ namespace FSM.Net.Core.NUnitTest
             StateMachine.AddState(S10, S01);
             StateMachine.AddState(S11, S01);
             return StateMachine.Exists(state);
+        }
+
+        [Test]
+        [TestCaseSource(nameof(TestCaseBuildPath))]
+        public bool TestPathTo(IState state, IState[] expected)
+        {
+            StateMachine.AddState(S00);
+            StateMachine.AddState(S01);
+            StateMachine.AddState(S10, S01);
+            StateMachine.AddState(S11, S01);
+            return StateMachine.PathTo(state).SequenceEqual(expected);
         }
 
         [Test]

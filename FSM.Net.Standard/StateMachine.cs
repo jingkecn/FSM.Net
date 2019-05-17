@@ -14,7 +14,7 @@ namespace FSM.Net.Standard
             }
             else
             {
-                var path = BuildPathTo(parent).ToList();
+                var path = PathTo(parent).ToList();
                 Remove(path.ToArray());
                 path.Add(state);
                 Insert(path.ToArray());
@@ -29,7 +29,7 @@ namespace FSM.Net.Standard
         public void Activate(IState state)
         {
             var current = Search(node => node.IsEnd && node.Value.IsActive).SingleOrDefault();
-            var toStates = BuildPathTo(state).ToList();
+            var toStates = PathTo(state).ToList();
             while (current != null && current != Root && !toStates.Contains(current.Value))
             {
                 current.Value.Exit();
@@ -50,22 +50,14 @@ namespace FSM.Net.Standard
             }
         }
 
-        public IEnumerable<IState> BuildPathTo(IState state)
+        public IEnumerable<IState> PathTo(IState state)
         {
-            var stack = new Stack<IState>();
-            var node = Search(state);
-            while (node != null && node != Root)
-            {
-                stack.Push(node.Value);
-                node = node.Parent;
-            }
-
-            return stack.ToArray();
+            return PathTo(node => node.Value == state).Select(node => node.Value);
         }
 
         public bool Exists(IState state)
         {
-            return BuildPathTo(state).Count() != 0;
+            return Search(state) != null;
         }
 
         public Node<IState> Search(IState state)
