@@ -27,5 +27,10 @@ namespace FSM.Net.Standard
                 if (!node.Value.IsActive) node.Value.Enter();
             }
         }
+
+        public Node<IState> Search(IState state)
+        {
+            return Search(node => node.Value == state).SingleOrDefault();
+        }
     }
 }
