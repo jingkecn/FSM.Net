@@ -6,26 +6,27 @@ namespace FSM.Net.Standard
 {
     public class StateMachine : Trie<IState>
     {
-        public void Activate(params IState[] states)
+        public void Activate(IState state)
         {
-            if (!Exists(states)) return;
-            var node = Root;
-            // Find deepest active state.
-            while (!node.IsEnd && node.Children.Any(child => child.Value.IsActive))
-                node = node.Children.Single(child => child.Value.IsActive);
-            // Exit active states that are not in the target states path.
-            while (node != Root && !states.Contains(node.Value))
+            var current = Search(node => node.IsEnd && node.Value.IsActive).SingleOrDefault();
+            var toStates = BuildPathTo(state).ToList();
+            while (current != null && current != Root && !toStates.Contains(current.Value))
             {
-                node.Value.Exit();
-                node = node.Parent;
+                current.Value.Exit();
+                current = current.Parent;
             }
 
-            // Enter the rest states of the target states path.
-            node = Root;
-            foreach (var state in states)
+            toStates.ForEach(toState =>
             {
-                node = node.Children.Single(child => child.Value == state);
-                if (!node.Value.IsActive) node.Value.Enter();
+                if (!toState.IsActive) toState.Enter();
+            });
+
+            var toNode = Search(state);
+            while (toNode != null && !toNode.IsEnd)
+            {
+                var child = toNode.Children.FirstOrDefault();
+                child?.Value?.Enter();
+                toNode = child;
             }
         }
 

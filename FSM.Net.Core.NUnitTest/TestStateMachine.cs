@@ -22,25 +22,15 @@ namespace FSM.Net.Core.NUnitTest
         private static readonly IState S11 = new State(nameof(S11));
         private static readonly IState StateNotExists = new State(nameof(StateNotExists));
 
-        private static IEnumerable<IState> States => new List<IState> {S00, S01, S10, S11};
-
         public static IEnumerable TestCaseActivate
         {
             get
             {
-                yield return new TestCaseData(new List<IState> {S00});
-                yield return new TestCaseData(new List<IState> {S01, S10});
-                yield return new TestCaseData(new List<IState> {S01, S11});
-            }
-        }
-
-        public static IEnumerable TestCaseActivateAgain
-        {
-            get
-            {
-                yield return new TestCaseData(new List<IState> {S00}, new List<IState> {S01, S10});
-                yield return new TestCaseData(new List<IState> {S01, S10}, new List<IState> {S01, S11});
-                yield return new TestCaseData(new List<IState> {S01, S11}, new List<IState> {S00});
+                yield return new TestCaseData(S00, new[] {S00}).Returns(true);
+                yield return new TestCaseData(S01, new[] {S01}).Returns(false);
+                yield return new TestCaseData(S01, new[] {S01, S10}).Returns(true);
+                yield return new TestCaseData(S10, new[] {S01, S10}).Returns(true);
+                yield return new TestCaseData(S11, new[] {S01, S11}).Returns(true);
             }
         }
 
@@ -83,32 +73,22 @@ namespace FSM.Net.Core.NUnitTest
 
         [Test]
         [TestCaseSource(nameof(TestCaseActivate))]
-        public void TestActivate(List<IState> states)
+        public bool TestActivate(IState state, IState[] expected)
         {
             StateMachine.Insert(S00);
             StateMachine.Insert(S01, S10);
             StateMachine.Insert(S01, S11);
-            StateMachine.Activate(states.ToArray());
-            Assert.IsTrue(states.All(state => state.IsActive));
-            Assert.IsFalse(
-                (from state in States where !states.Contains(state) select state).All(state => state.IsActive));
-        }
+            StateMachine.Activate(state);
+            var actual = new List<IState>();
+            var node = StateMachine.Root;
+            do
+            {
+                var active = node.Children.Single(child => child.Value.IsActive);
+                actual.Add(active.Value);
+                node = active;
+            } while (!node.IsEnd);
 
-        [Test]
-        [TestCaseSource(nameof(TestCaseActivateAgain))]
-        public void TestActivateAgain(List<IState> firstStates, List<IState> secondStates)
-        {
-            StateMachine.Insert(S00);
-            StateMachine.Insert(S01, S10);
-            StateMachine.Insert(S01, S11);
-            StateMachine.Activate(firstStates.ToArray());
-            Assert.IsTrue(firstStates.All(state => state.IsActive));
-            Assert.IsFalse(
-                (from state in States where !firstStates.Contains(state) select state).All(state => state.IsActive));
-            StateMachine.Activate(secondStates.ToArray());
-            Assert.IsTrue(secondStates.All(state => state.IsActive));
-            Assert.IsFalse(
-                (from state in States where !secondStates.Contains(state) select state).All(state => state.IsActive));
+            return actual.SequenceEqual(expected);
         }
 
         [Test]
