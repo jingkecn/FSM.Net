@@ -1,4 +1,5 @@
-﻿using System.Linq;
+﻿using System.Collections.Generic;
+using System.Linq;
 using Trie.Net.Standard;
 
 namespace FSM.Net.Standard
@@ -26,6 +27,19 @@ namespace FSM.Net.Standard
                 node = node.Children.Single(child => child.Value == state);
                 if (!node.Value.IsActive) node.Value.Enter();
             }
+        }
+
+        public IEnumerable<IState> BuildPathTo(IState state)
+        {
+            var stack = new Stack<IState>();
+            var node = Search(state);
+            while (node != null && node != Root)
+            {
+                stack.Push(node.Value);
+                node = node.Parent;
+            }
+
+            return stack.ToArray();
         }
 
         public Node<IState> Search(IState state)

@@ -44,6 +44,17 @@ namespace FSM.Net.Core.NUnitTest
             }
         }
 
+        public static IEnumerable TestCaseBuildPath
+        {
+            get
+            {
+                yield return new TestCaseData(S00, new[] {S00}).Returns(true);
+                yield return new TestCaseData(S01, new[] {S01}).Returns(true);
+                yield return new TestCaseData(S10, new[] {S01, S10}).Returns(true);
+                yield return new TestCaseData(S11, new[] {S01, S11}).Returns(true);
+            }
+        }
+
         public static IEnumerable TestCaseSearch
         {
             get
@@ -86,6 +97,16 @@ namespace FSM.Net.Core.NUnitTest
             Assert.IsTrue(secondStates.All(state => state.IsActive));
             Assert.IsFalse(
                 (from state in States where !secondStates.Contains(state) select state).All(state => state.IsActive));
+        }
+
+        [Test]
+        [TestCaseSource(nameof(TestCaseBuildPath))]
+        public bool TestBuildPathTo(IState state, IState[] expected)
+        {
+            StateMachine.Insert(S00);
+            StateMachine.Insert(S01, S10);
+            StateMachine.Insert(S01, S11);
+            return StateMachine.BuildPathTo(state).SequenceEqual(expected);
         }
 
         [Test]
