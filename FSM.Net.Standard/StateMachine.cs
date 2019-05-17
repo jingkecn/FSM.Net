@@ -6,26 +6,6 @@ namespace FSM.Net.Standard
 {
     public partial class StateMachine
     {
-        public void AddState(IState state, IState parent = null)
-        {
-            if (parent == null)
-            {
-                Insert(state);
-            }
-            else
-            {
-                var path = PathTo(parent).ToList();
-                Remove(path.ToArray());
-                path.Add(state);
-                Insert(path.ToArray());
-            }
-        }
-    }
-
-    #region Implementation (Trie)
-
-    public partial class StateMachine : Trie<IState>
-    {
         public void Activate(IState state)
         {
             var current = Search(node => node.IsEnd && node.Value.IsActive).SingleOrDefault();
@@ -50,6 +30,26 @@ namespace FSM.Net.Standard
             }
         }
 
+        public void AddState(IState state, IState parent = null)
+        {
+            if (parent == null)
+            {
+                Insert(state);
+            }
+            else
+            {
+                var path = PathTo(parent).ToList();
+                Remove(path.ToArray());
+                path.Add(state);
+                Insert(path.ToArray());
+            }
+        }
+    }
+
+    #region Implementation (Trie)
+
+    public partial class StateMachine : Trie<IState>
+    {
         public IEnumerable<IState> PathTo(IState state)
         {
             return PathTo(node => node.Value == state).Select(node => node.Value);
