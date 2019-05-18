@@ -32,17 +32,15 @@ namespace FSM.Net.Standard
 
         public void AddState(IState state, IState parent = null)
         {
-            if (parent == null)
+            var path = new List<IState>();
+            if (parent != null)
             {
-                Insert(state);
-            }
-            else
-            {
-                var path = PathTo(parent).ToList();
+                path.AddRange(PathTo(parent));
                 Remove(path.ToArray());
-                path.Add(state);
-                Insert(path.ToArray());
             }
+
+            path.Add(state);
+            Insert(path.ToArray());
         }
     }
 
