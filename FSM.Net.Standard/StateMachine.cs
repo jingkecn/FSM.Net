@@ -6,7 +6,20 @@ namespace FSM.Net.Standard
 {
     public partial class StateMachine
     {
-        public void Activate(IState state)
+        public void AddState(IState state, IState parent = null)
+        {
+            var path = new List<IState>();
+            if (parent != null)
+            {
+                path.AddRange(PathTo(parent));
+                Remove(path.ToArray());
+            }
+
+            path.Add(state);
+            Insert(path.ToArray());
+        }
+
+        public void TransitionTo(IState state)
         {
             var current = Search(node => node.IsEnd && node.Value.IsActive).SingleOrDefault();
             var toStates = PathTo(state).ToList();
@@ -28,19 +41,6 @@ namespace FSM.Net.Standard
                 child?.Value?.Enter();
                 toNode = child;
             }
-        }
-
-        public void AddState(IState state, IState parent = null)
-        {
-            var path = new List<IState>();
-            if (parent != null)
-            {
-                path.AddRange(PathTo(parent));
-                Remove(path.ToArray());
-            }
-
-            path.Add(state);
-            Insert(path.ToArray());
         }
     }
 
