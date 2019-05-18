@@ -34,6 +34,19 @@ namespace FSM.Net.Core.NUnitTest
             }
         }
 
+        public static IEnumerable TestCaseAddState
+        {
+            get
+            {
+                yield return new TestCaseData(S00, null, null, new[] {S00}).Returns(true);
+                yield return new TestCaseData(S01, null, null, new[] {S01}).Returns(true);
+                yield return new TestCaseData(S10, S01, new[] {new[] {S00}, new[] {S01}}, new[] {S01, S10})
+                    .Returns(true);
+                yield return new TestCaseData(S11, S01, new[] {new[] {S00}, new[] {S01}, new[] {S01, S10}},
+                    new[] {S01, S11}).Returns(true);
+            }
+        }
+
         public static IEnumerable TestCaseAddS00
         {
             get { yield return new TestCaseData(S00, null, new[] {S00}).Returns(true); }
@@ -91,12 +104,6 @@ namespace FSM.Net.Core.NUnitTest
 
         private StateMachine StateMachine { get; set; }
 
-        private bool TestAddState(IState state, IState parent, IEnumerable<IState> expected)
-        {
-            StateMachine.AddState(state, parent);
-            return StateMachine.PathTo(state).SequenceEqual(expected);
-        }
-
         [Test]
         [TestCaseSource(nameof(TestCaseActivate))]
         public bool TestActivate(IState state, IState[] expected)
@@ -119,36 +126,15 @@ namespace FSM.Net.Core.NUnitTest
         }
 
         [Test]
-        [TestCaseSource(nameof(TestCaseAddS00))]
-        public bool TestAddS00(IState state, IState parent, IState[] expected)
+        [TestCaseSource(nameof(TestCaseAddState))]
+        public bool TestAddState(IState state, IState parent, IEnumerable<IEnumerable<IState>> presets,
+            IEnumerable<IState> expected)
         {
-            return TestAddState(state, parent, expected);
-        }
-
-        [Test]
-        [TestCaseSource(nameof(TestCaseAddS01))]
-        public bool TestAddS01(IState state, IState parent, IState[] expected)
-        {
-            StateMachine.AddState(S00);
-            return TestAddState(state, parent, expected);
-        }
-
-        [Test]
-        [TestCaseSource(nameof(TestCaseAddS10))]
-        public bool TestAddS10(IState state, IState parent, IState[] expected)
-        {
-            StateMachine.AddState(S00);
-            StateMachine.AddState(S01);
-            return TestAddState(state, parent, expected);
-        }
-
-        [Test]
-        [TestCaseSource(nameof(TestCaseAddS11))]
-        public bool TestAddS11(IState state, IState parent, IState[] expected)
-        {
-            StateMachine.AddState(S00);
-            StateMachine.AddState(S01);
-            return TestAddState(state, parent, expected);
+            if (presets != null)
+                foreach (var preset in presets)
+                    StateMachine.Insert(preset.ToArray());
+            StateMachine.AddState(state, parent);
+            return StateMachine.PathTo(state).SequenceEqual(expected);
         }
 
         [Test]
