@@ -105,7 +105,7 @@ namespace FSM.Net.Core.NUnitTest
         public bool TestExists(IState state, IEnumerable<IEnumerable<IState>> presets)
         {
             foreach (var preset in presets) StateMachine.Insert(preset.ToArray());
-            return StateMachine.Exists(state);
+            return StateMachine.Contains(state);
         }
 
         [Test]
@@ -121,7 +121,8 @@ namespace FSM.Net.Core.NUnitTest
         public bool TestSearch(IState state, IEnumerable<IEnumerable<IState>> presets)
         {
             foreach (var preset in presets) StateMachine.Insert(preset.ToArray());
-            return StateMachine.Search(state) is Node<IState> node && node.Value == state;
+            return StateMachine.Search(node => node.Value == state).SingleOrDefault() is Node<IState> target &&
+                   target.Value == state;
         }
 
         [Test]

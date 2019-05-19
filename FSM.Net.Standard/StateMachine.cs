@@ -34,7 +34,7 @@ namespace FSM.Net.Standard
                 if (!toState.IsActive) toState.Enter();
             });
 
-            var toNode = Search(state);
+            var toNode = Search(node => node.Value == state).SingleOrDefault();
             while (toNode != null && !toNode.IsEnd)
             {
                 var child = toNode.Children.FirstOrDefault();
@@ -48,19 +48,16 @@ namespace FSM.Net.Standard
 
     public partial class StateMachine : Trie<IState>
     {
+        public bool Contains(IState state)
+        {
+            return PathTo(state) != null;
+        }
+
         public IEnumerable<IState> PathTo(IState state)
         {
-            return PathTo(node => node.Value == state).Select(node => node.Value);
-        }
-
-        public bool Exists(IState state)
-        {
-            return Search(state) != null;
-        }
-
-        public Node<IState> Search(IState state)
-        {
-            return Search(node => node.Value == state).SingleOrDefault();
+            return PathTo(node => node.Value == state)
+                .Select(nodes => nodes.Select(node => node.Value))
+                .SingleOrDefault();
         }
     }
 
