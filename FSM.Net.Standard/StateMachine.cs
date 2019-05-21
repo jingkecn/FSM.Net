@@ -21,7 +21,7 @@ namespace FSM.Net.Standard
 
         public void TransitionTo(IState state)
         {
-            var current = Search(node => node.IsEnd && node.Value.IsActive).SingleOrDefault();
+            var current = Search(node => node.IsEnd && node.Value.IsActive).Single();
             var toStates = PathTo(state).ToList();
             while (current != null && current != Root && !toStates.Contains(current.Value))
             {
@@ -34,11 +34,11 @@ namespace FSM.Net.Standard
                 if (!toState.IsActive) toState.Enter();
             });
 
-            var toNode = Search(node => node.Value == state).SingleOrDefault();
+            var toNode = Search(node => node.Value == state).Single();
             while (toNode != null && !toNode.IsEnd)
             {
-                var child = toNode.Children.FirstOrDefault();
-                child?.Value?.Enter();
+                var child = toNode.Children.First();
+                child.Value.Enter();
                 toNode = child;
             }
         }
@@ -55,9 +55,7 @@ namespace FSM.Net.Standard
 
         public IEnumerable<IState> PathTo(IState state)
         {
-            return PathTo(node => node.Value == state)
-                .Select(nodes => nodes.Select(node => node.Value))
-                .SingleOrDefault();
+            return PathTo(node => node.Value == state).Single().Select(node => node.Value);
         }
     }
 
