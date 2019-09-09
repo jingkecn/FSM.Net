@@ -55,7 +55,7 @@ namespace FSM.Net.Standard
 
         public IEnumerable<IState> PathTo(IState state)
         {
-            return PathTo(node => node.Value == state).Single().Select(node => node.Value);
+            return PathTo(node => node.Value == state).SingleOrDefault()?.Select(node => node.Value);
         }
     }
 
