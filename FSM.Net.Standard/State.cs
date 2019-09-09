@@ -41,5 +41,10 @@ namespace FSM.Net.Standard
 #endif
             IsActive = false;
         }
+
+        public override string ToString()
+        {
+            return $"{base.ToString()} ({nameof(Name)}={Name}, {nameof(IsActive)}={IsActive})";
+        }
     }
 }
