@@ -133,17 +133,10 @@ namespace FSM.Net.Core.NUnitTest
             StateMachine.AddState(S01);
             StateMachine.AddState(S10, S01);
             StateMachine.AddState(S11, S01);
+            S00.Enter();
             StateMachine.TransitionTo(state);
-            var actual = new List<IState>();
-            var node = StateMachine.Root;
-            do
-            {
-                var active = node.Children.Single(child => child.Value.IsActive);
-                actual.Add(active.Value);
-                node = active;
-            } while (!node.IsEnd);
 
-            return actual.SequenceEqual(expected);
+            return expected.SequenceEqual(StateMachine.ActivePath);
         }
     }
 }
